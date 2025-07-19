@@ -1,0 +1,44 @@
+{
+    "axe": {
+        "wt": "AXE",
+        "dt": "SLASHING",
+        "num_attacks": 1,
+        "damage": 12,
+        "et": "NONE",
+        "effect_damage": 0,
+        "effect_percent": 0
+    },
+    "club": {
+    },
+    "dagger": {
+        "wt": "DAGGER",
+        "dt": "PIERCING",
+        "num_attacks": 2,
+        "damage": 1,
+        "et": "POISON",
+        "effect_damage": 2,
+        "effect_percent": 0.24
+    },
+    "fist": {
+    },
+    "hammer": {
+    },
+    "katana": {
+        "wt": "KATANA",
+        "dt": "SLASHING",
+        "num_attacks": 1,
+        "damage": 4,
+        "et": "BLEED",
+        "effect_damage": 72,
+        "effect_percent": 0.15
+    },
+    "mace": {
+    },
+    "shield": {
+    },
+    "spear": {
+
+    },
+    "sword": {
+    }
+}

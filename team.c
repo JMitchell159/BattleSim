@@ -1,8 +1,35 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "team.h"
+
+combatant_t create_unit(weapon_t primary, weapon_t secondary, int team_id, int health, int speed, float block_chance, float dodge_chance) {
+    combatant_t unit = {
+        .primary = primary,
+        .secondary = secondary,
+        .team_id = team_id,
+        .health = health,
+        .speed = speed,
+        .bleed_percent = 0.0,
+        .poison_percent = 0.0,
+        .stun_percent = 0.0,
+        .stun_instances = 0,
+        .block_chance = block_chance,
+        .dodge_chance = dodge_chance
+    };
+    return unit;
+}
+
+team_t create_team(combatant_t* units, char *name, int team_id) {
+    team_t team = {
+        .units = units,
+        .name = name,
+        .size = sizeof(units) / sizeof(units[0]),
+        .team_id = team_id
+    };
+    return team;
+}
 
 void print_team(team_t t) {
     printf("%s\n", t.name);
@@ -55,4 +82,58 @@ void print_team(team_t t) {
     }
     strcat(line6, "=\n");
     printf("%s", line6);
+}
+
+combatant_t attack(combatant_t attacker, bool is_primary, combatant_t defender) {
+    float to_hit = (float)(rand() % 100 + 1)/100.0;
+    float avoid_chance = defender.block_chance + defender.dodge_chance * (1 - defender.block_chance);
+    if(avoid_chance >= to_hit) return defender;
+
+    if(is_primary) {
+        defender.health -= attacker.primary.damage;
+        switch(attacker.primary.et) {
+            case BLEED:
+                defender.bleed_percent += attacker.primary.effect_percent;
+                if(defender.bleed_percent >= 1.0) {
+                    defender.health -= attacker.primary.effect_damage;
+                    defender.bleed_percent -= 1.0;
+                }
+                break;
+            case POISON:
+                defender.poison_percent += attacker.primary.effect_percent;
+                if(defender.poison_percent > 1.0) defender.poison_percent = 1.0;
+                break;
+            case STUN:
+                defender.stun_percent += attacker.primary.effect_percent;
+                if(defender.stun_percent >= 1.0) {
+                    defender.stun_instances++;
+                    defender.stun_percent -= 1.0;
+                }
+                break;
+        }
+        return defender;
+    }
+
+    defender.health -= attacker.secondary.damage;
+    switch(attacker.secondary.et) {
+        case BLEED:
+            defender.bleed_percent += attacker.secondary.effect_percent;
+            if(defender.bleed_percent >= 1.0) {
+                defender.health -= attacker.secondary.effect_damage;
+                defender.bleed_percent -= 1.0;
+            }
+            break;
+        case POISON:
+            defender.poison_percent += attacker.secondary.effect_percent;
+            if(defender.poison_percent > 1.0) defender.poison_percent = 1.0;
+            break;
+        case STUN:
+            defender.stun_percent += attacker.secondary.effect_percent;
+            if(defender.stun_percent >= 1.0) {
+                defender.stun_instances++;
+                defender.stun_percent -= 1.0;
+            }
+            break;
+    }
+    return defender;
 }
