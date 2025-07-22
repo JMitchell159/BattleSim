@@ -4,8 +4,8 @@
 
 #include "team.h"
 
-combatant_t create_unit(weapon_t primary, weapon_t secondary, int team_id, int health, int speed, float block_chance, float dodge_chance) {
-    combatant_t unit = {
+unit_t create_unit(weapon_t primary, weapon_t secondary, int team_id, int health, int speed, float block_chance, float dodge_chance) {
+    unit_t unit = {
         .primary = primary,
         .secondary = secondary,
         .team_id = team_id,
@@ -18,10 +18,11 @@ combatant_t create_unit(weapon_t primary, weapon_t secondary, int team_id, int h
         .block_chance = block_chance,
         .dodge_chance = dodge_chance
     };
+    if(secondary.effect_type == BLOCK) unit.block_chance += secondary.effect_percent;
     return unit;
 }
 
-team_t create_team(combatant_t* units, char *name, int team_id) {
+team_t create_team(unit_t* units, char *name, int team_id) {
     team_t team = {
         .units = units,
         .name = name,
@@ -84,10 +85,15 @@ void print_team(team_t t) {
     printf("%s", line6);
 }
 
-combatant_t attack(combatant_t attacker, bool is_primary, combatant_t defender) {
+unit_t attack(unit_t attacker, bool is_primary, unit_t defender) {
     float to_hit = (float)(rand() % 100 + 1)/100.0;
     float avoid_chance = defender.block_chance + defender.dodge_chance * (1 - defender.block_chance);
-    if(avoid_chance >= to_hit) return defender;
+    if(avoid_chance >= to_hit) {
+        printf("miss\n");
+        return defender;
+    }
+
+    printf("hit\n");
 
     if(is_primary) {
         defender.health -= attacker.primary.damage;

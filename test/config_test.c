@@ -1,0 +1,440 @@
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+#include "/home/joemi/workspace/github.com/JMitchell159/BattleSim/team.h"
+#include "/home/joemi/workspace/github.com/JMitchell159/BattleSim/team.c"
+#include "/home/joemi/workspace/github.com/JMitchell159/BattleSim/weapon.h"
+#include "/home/joemi/workspace/github.com/JMitchell159/BattleSim/weapon.c"
+
+#define WEAPONS 90
+#define ALLOWED 10
+
+int main() {
+    FILE *allowed;
+    FILE *weapons;
+    char allowed_row[ALLOWED];
+    char weapons_row[WEAPONS];
+    weapon_t weapon_list[30];
+    char *token;
+
+    allowed = fopen("config/allowed_weapons.txt", "r");
+    weapons = fopen("config/weapons.csv", "r");
+
+    int i = 0;
+
+    // Remove header
+    fgets(weapons_row, WEAPONS, weapons);
+
+    while(!feof(allowed)) {
+        fgets(allowed_row, ALLOWED, allowed);
+        while(!feof(weapons)) {
+            fgets(weapons_row, WEAPONS, weapons);
+            token = strtok(weapons_row, ",");
+            if(strncmp(allowed_row, token, strlen(token)) < 0) return 1;
+            if(strncmp(allowed_row, token, strlen(token)) == 0) {
+                // pulls weapon_type
+                token = strtok(NULL, ",");
+                switch(strcmp(token, "AXE")) {
+                    case 0:
+                        weapon_list[i].weapon_type = AXE;
+                        break;
+                    case 2:
+                        weapon_list[i].weapon_type = CLUB;
+                        break;
+                    case 3:
+                        weapon_list[i].weapon_type = DAGGER;
+                        break;
+                    case 5:
+                        weapon_list[i].weapon_type = FIST;
+                        break;
+                    case 7:
+                        weapon_list[i].weapon_type = HAMMER;
+                        break;
+                    case 10:
+                        weapon_list[i].weapon_type = KATANA;
+                        break;
+                    case 12:
+                        weapon_list[i].weapon_type = MACE;
+                        break;
+                    case 18:
+                        switch(strcmp(token, "SHIELD")) {
+                            case 0:
+                                weapon_list[i].weapon_type = SHIELD;
+                                break;
+                            case 8:
+                                weapon_list[i].weapon_type = SPEAR;
+                                break;
+                            case 15:
+                                weapon_list[i].weapon_type = SWORD;
+                                break;
+                        }
+                }
+
+                // pulls damage_type
+                token = strtok(NULL, ",");
+                switch(strcmp(token, "BLUNT")) {
+                    case 0:
+                        weapon_list[i].damage_type = BLUNT;
+                        break;
+                    case 14:
+                        weapon_list[i].damage_type = PIERCING;
+                        break;
+                    case 17:
+                        weapon_list[i].damage_type = SLASHING;
+                        break;
+                }
+
+                // pulls num_attacks
+                token = strtok(NULL, ",");
+                weapon_list[i].num_attacks = atoi(token);
+
+                // pulls damage
+                token = strtok(NULL, ",");
+                weapon_list[i].damage = atoi(token);
+
+                // pulls effect_type
+                token = strtok(NULL, ",");
+                switch(strcmp(token, "BLEED")) {
+                    case 0:
+                        weapon_list[i].effect_type = BLEED;
+                        break;
+                    case 10:
+                        weapon_list[i].effect_type = BLOCK;
+                        break;
+                    case 14:
+                        weapon_list[i].effect_type = POISON;
+                        break;
+                    case 17:
+                        weapon_list[i].effect_type = STUN;
+                        break;
+                    default:
+                        weapon_list[i].effect_type = NONE;
+                        break;
+                }
+
+                // pulls effect_damage
+                token = strtok(NULL, ",");
+                weapon_list[i].effect_damage = atoi(token);
+
+                // pulls effect_percent
+                token = strtok(NULL, ",");
+                weapon_list[i].effect_percent = atof(token);
+
+                i++;
+            }
+            break;
+        }
+    }
+
+    unit_t* team1_units = malloc(4*sizeof(unit_t));
+    unit_t* team2_units = malloc(4*sizeof(unit_t));
+
+    int choice = 0;
+    int shield_idx = -1;
+    for(int i = 0; i < 10; i++) {
+        if(weapon_list[i].weapon_type < SHIELD) {
+            printf("====================\n");
+            printf("Choice #%d\n", i + 1);
+            print_weapon(weapon_list[i]);
+            printf("=====================\n");
+        } else if (weapon_list[i].weapon_type > SHIELD) {
+            printf("=====================\n");
+            printf("Choice #%d\n", i);
+            print_weapon(weapon_list[i]);
+            printf("=====================\n");
+        } else shield_idx = i;
+    }
+
+    printf("Team 1, Choose Unit 1's Primary Weapon (Enter a number):");
+    scanf("%d", &choice);
+    while(choice < 1 || choice > 9) {
+        printf("Please choose a valid option:");
+        scanf("%d", &choice);
+    }
+
+    weapon_t primary;
+    if(weapon_list[choice].weapon_type <= SHIELD) primary = create_weapon(
+        weapon_list[choice - 1].weapon_type,
+        weapon_list[choice - 1].damage_type,
+        weapon_list[choice - 1].num_attacks,
+        weapon_list[choice - 1].damage,
+        weapon_list[choice - 1].effect_type,
+        weapon_list[choice - 1].effect_damage,
+        weapon_list[choice - 1].effect_percent
+    );
+    else primary = create_weapon(
+        weapon_list[choice].weapon_type,
+        weapon_list[choice].damage_type,
+        weapon_list[choice].num_attacks,
+        weapon_list[choice].damage,
+        weapon_list[choice].effect_type,
+        weapon_list[choice].effect_damage,
+        weapon_list[choice].effect_percent
+    );
+
+    printf("=====================\n");
+    printf("Choice #10\n");
+    print_weapon(weapon_list[shield_idx]);
+    printf("=====================\n");
+
+    printf("Team 1, Choose Unit 1's Secondary Weapon (Enter a number):");
+    scanf("%d", &choice);
+    while(choice < 1 || choice > 10) {
+        printf("Please choose a valid option:");
+        scanf("%d", &choice);
+    }
+
+    weapon_t secondary;
+    if(choice == 10) secondary = create_weapon(
+        weapon_list[shield_idx].weapon_type,
+        weapon_list[shield_idx].damage_type,
+        weapon_list[shield_idx].num_attacks,
+        weapon_list[shield_idx].damage,
+        weapon_list[shield_idx].effect_type,
+        weapon_list[shield_idx].effect_damage,
+        weapon_list[shield_idx].effect_percent
+    );
+    else if(weapon_list[choice].weapon_type <= SHIELD) secondary = create_weapon(
+        weapon_list[choice - 1].weapon_type,
+        weapon_list[choice - 1].damage_type,
+        weapon_list[choice - 1].num_attacks,
+        weapon_list[choice - 1].damage,
+        weapon_list[choice - 1].effect_type,
+        weapon_list[choice - 1].effect_damage,
+        weapon_list[choice - 1].effect_percent
+    );
+    else secondary = create_weapon(
+        weapon_list[choice].weapon_type,
+        weapon_list[choice].damage_type,
+        weapon_list[choice].num_attacks,
+        weapon_list[choice].damage,
+        weapon_list[choice].effect_type,
+        weapon_list[choice].effect_damage,
+        weapon_list[choice].effect_percent
+    );
+
+    team1_units[0] = create_unit(primary, secondary, 1, 50, 5, 0.0, 0.15);
+
+    for(int i = 1; i < 4; i++) {
+        printf("Unit %d Primary:", i + 1);
+        scanf("%d", &choice);
+        while(choice < 1 || choice > 9) {
+            printf("Please choose a valid option:");
+            scanf("%d", &choice);
+        }
+
+        weapon_t primary;
+        if(weapon_list[choice].weapon_type <= SHIELD) primary = create_weapon(
+            weapon_list[choice - 1].weapon_type,
+            weapon_list[choice - 1].damage_type,
+            weapon_list[choice - 1].num_attacks,
+            weapon_list[choice - 1].damage,
+            weapon_list[choice - 1].effect_type,
+            weapon_list[choice - 1].effect_damage,
+            weapon_list[choice - 1].effect_percent
+        );
+        else primary = create_weapon(
+            weapon_list[choice].weapon_type,
+            weapon_list[choice].damage_type,
+            weapon_list[choice].num_attacks,
+            weapon_list[choice].damage,
+            weapon_list[choice].effect_type,
+            weapon_list[choice].effect_damage,
+            weapon_list[choice].effect_percent
+        );
+
+        printf("Unit %d Secondary:", i + 1);
+        scanf("%d", &choice);
+        while(choice < 1 || choice > 10) {
+            printf("Please choose a valid option:");
+            scanf("%d", &choice);
+        }
+
+        weapon_t secondary;
+        if(choice == 10) secondary = create_weapon(
+            weapon_list[shield_idx].weapon_type,
+            weapon_list[shield_idx].damage_type,
+            weapon_list[shield_idx].num_attacks,
+            weapon_list[shield_idx].damage,
+            weapon_list[shield_idx].effect_type,
+            weapon_list[shield_idx].effect_damage,
+            weapon_list[shield_idx].effect_percent
+        );
+        else if(weapon_list[choice].weapon_type <= SHIELD) secondary = create_weapon(
+            weapon_list[choice - 1].weapon_type,
+            weapon_list[choice - 1].damage_type,
+            weapon_list[choice - 1].num_attacks,
+            weapon_list[choice - 1].damage,
+            weapon_list[choice - 1].effect_type,
+            weapon_list[choice - 1].effect_damage,
+            weapon_list[choice - 1].effect_percent
+        );
+        else secondary = create_weapon(
+            weapon_list[choice].weapon_type,
+            weapon_list[choice].damage_type,
+            weapon_list[choice].num_attacks,
+            weapon_list[choice].damage,
+            weapon_list[choice].effect_type,
+            weapon_list[choice].effect_damage,
+            weapon_list[choice].effect_percent
+        );
+
+        team1_units[i] = create_unit(primary, secondary, 1, 50, 5, 0.0, 0.15);
+    }
+
+    choice = 0;
+    shield_idx = -1;
+    for(int i = 0; i < 10; i++) {
+        if(weapon_list[i].weapon_type < SHIELD) {
+            printf("====================\n");
+            printf("Choice #%d\n", i + 1);
+            print_weapon(weapon_list[i]);
+            printf("=====================\n");
+        } else if (weapon_list[i].weapon_type > SHIELD) {
+            printf("=====================\n");
+            printf("Choice #%d\n", i);
+            print_weapon(weapon_list[i]);
+            printf("=====================\n");
+        } else shield_idx = i;
+    }
+
+    printf("Team 2, Choose Unit 1's Primary Weapon (Enter a number):");
+    scanf("%d", &choice);
+    while(choice < 1 || choice > 9) {
+        printf("Please choose a valid option:");
+        scanf("%d", &choice);
+    }
+
+    if(weapon_list[choice].weapon_type <= SHIELD) primary = create_weapon(
+        weapon_list[choice - 1].weapon_type,
+        weapon_list[choice - 1].damage_type,
+        weapon_list[choice - 1].num_attacks,
+        weapon_list[choice - 1].damage,
+        weapon_list[choice - 1].effect_type,
+        weapon_list[choice - 1].effect_damage,
+        weapon_list[choice - 1].effect_percent
+    );
+    else primary = create_weapon(
+        weapon_list[choice].weapon_type,
+        weapon_list[choice].damage_type,
+        weapon_list[choice].num_attacks,
+        weapon_list[choice].damage,
+        weapon_list[choice].effect_type,
+        weapon_list[choice].effect_damage,
+        weapon_list[choice].effect_percent
+    );
+
+    printf("=====================\n");
+    printf("Choice #10\n");
+    print_weapon(weapon_list[shield_idx]);
+    printf("=====================\n");
+
+    printf("Team 2, Choose Unit 1's Secondary Weapon (Enter a number):");
+    scanf("%d", &choice);
+    while(choice < 1 || choice > 10) {
+        printf("Please choose a valid option:");
+        scanf("%d", &choice);
+    }
+
+    if(choice == 10) secondary = create_weapon(
+        weapon_list[shield_idx].weapon_type,
+        weapon_list[shield_idx].damage_type,
+        weapon_list[shield_idx].num_attacks,
+        weapon_list[shield_idx].damage,
+        weapon_list[shield_idx].effect_type,
+        weapon_list[shield_idx].effect_damage,
+        weapon_list[shield_idx].effect_percent
+    );
+    else if(weapon_list[choice].weapon_type <= SHIELD) secondary = create_weapon(
+        weapon_list[choice - 1].weapon_type,
+        weapon_list[choice - 1].damage_type,
+        weapon_list[choice - 1].num_attacks,
+        weapon_list[choice - 1].damage,
+        weapon_list[choice - 1].effect_type,
+        weapon_list[choice - 1].effect_damage,
+        weapon_list[choice - 1].effect_percent
+    );
+    else secondary = create_weapon(
+        weapon_list[choice].weapon_type,
+        weapon_list[choice].damage_type,
+        weapon_list[choice].num_attacks,
+        weapon_list[choice].damage,
+        weapon_list[choice].effect_type,
+        weapon_list[choice].effect_damage,
+        weapon_list[choice].effect_percent
+    );
+
+    team2_units[0] = create_unit(primary, secondary, 1, 50, 5, 0.0, 0.15);
+
+    for(int i = 1; i < 4; i++) {
+        printf("Unit %d Primary:", i + 1);
+        scanf("%d", &choice);
+        while(choice < 1 || choice > 9) {
+            printf("Please choose a valid option:");
+            scanf("%d", &choice);
+        }
+
+        weapon_t primary;
+        if(weapon_list[choice].weapon_type <= SHIELD) primary = create_weapon(
+            weapon_list[choice - 1].weapon_type,
+            weapon_list[choice - 1].damage_type,
+            weapon_list[choice - 1].num_attacks,
+            weapon_list[choice - 1].damage,
+            weapon_list[choice - 1].effect_type,
+            weapon_list[choice - 1].effect_damage,
+            weapon_list[choice - 1].effect_percent
+        );
+        else primary = create_weapon(
+            weapon_list[choice].weapon_type,
+            weapon_list[choice].damage_type,
+            weapon_list[choice].num_attacks,
+            weapon_list[choice].damage,
+            weapon_list[choice].effect_type,
+            weapon_list[choice].effect_damage,
+            weapon_list[choice].effect_percent
+        );
+
+        printf("Unit %d Secondary:", i + 1);
+        scanf("%d", &choice);
+        while(choice < 1 || choice > 10) {
+            printf("Please choose a valid option:");
+            scanf("%d", &choice);
+        }
+
+        weapon_t secondary;
+        if(choice == 10) secondary = create_weapon(
+            weapon_list[shield_idx].weapon_type,
+            weapon_list[shield_idx].damage_type,
+            weapon_list[shield_idx].num_attacks,
+            weapon_list[shield_idx].damage,
+            weapon_list[shield_idx].effect_type,
+            weapon_list[shield_idx].effect_damage,
+            weapon_list[shield_idx].effect_percent
+        );
+        else if(weapon_list[choice].weapon_type <= SHIELD) secondary = create_weapon(
+            weapon_list[choice - 1].weapon_type,
+            weapon_list[choice - 1].damage_type,
+            weapon_list[choice - 1].num_attacks,
+            weapon_list[choice - 1].damage,
+            weapon_list[choice - 1].effect_type,
+            weapon_list[choice - 1].effect_damage,
+            weapon_list[choice - 1].effect_percent
+        );
+        else secondary = create_weapon(
+            weapon_list[choice].weapon_type,
+            weapon_list[choice].damage_type,
+            weapon_list[choice].num_attacks,
+            weapon_list[choice].damage,
+            weapon_list[choice].effect_type,
+            weapon_list[choice].effect_damage,
+            weapon_list[choice].effect_percent
+        );
+
+        team2_units[i] = create_unit(primary, secondary, 1, 50, 5, 0.0, 0.15);
+    }
+
+    return 0;
+}
