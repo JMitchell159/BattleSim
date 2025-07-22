@@ -21,17 +21,18 @@ typedef enum DamageType {
 
 typedef enum EffectType {
     BLEED,
+    BLOCK,
     POISON,
     STUN,
     NONE
 } effect_type_t;
 
 typedef struct Weapon {
-    weapon_type_t wt;
-    damage_type_t dt;
+    weapon_type_t weapon_type;
+    damage_type_t damage_type;
     int num_attacks;
     int damage;
-    effect_type_t et;
+    effect_type_t effect_type;
     int effect_damage;
     float effect_percent;
 } weapon_t;

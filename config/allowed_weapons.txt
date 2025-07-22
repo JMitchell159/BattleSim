@@ -1,0 +1,10 @@
+axe
+club
+dagger
+fist
+hammer
+katana
+mace
+shield
+spear
+sword

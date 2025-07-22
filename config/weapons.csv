@@ -1,0 +1,11 @@
+name,weapon_type,damage_type,num_attacks,damage,effect_type,effect_damage,effect_percent
+axe,AXE,SLASHING,1,8,NONE,0,0.0
+club,CLUB,BLUNT,1,12,NONE,0,0.0
+dagger,DAGGER,PIERCING,2,2,POISON,2,0.12
+fist,FIST,BLUNT,3,1,NONE,0,0.0
+hammer,HAMMER,BLUNT,1,5,STUN,0,0.15
+katana,KATANA,SLASHING,1,3,BLEED,50,0.1
+mace,MACE,BLUNT,1,10,NONE,0,0.0
+shield,SHIELD,BLUNT,1,1,BLOCK,0,0.15
+spear,SPEAR,PIERCING,2,4,NONE,0,0.0
+sword,SWORD,SLASHING,1,6,NONE,0,0.0

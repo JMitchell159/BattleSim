@@ -91,7 +91,7 @@ combatant_t attack(combatant_t attacker, bool is_primary, combatant_t defender) 
 
     if(is_primary) {
         defender.health -= attacker.primary.damage;
-        switch(attacker.primary.et) {
+        switch(attacker.primary.effect_type) {
             case BLEED:
                 defender.bleed_percent += attacker.primary.effect_percent;
                 if(defender.bleed_percent >= 1.0) {
@@ -115,7 +115,7 @@ combatant_t attack(combatant_t attacker, bool is_primary, combatant_t defender) 
     }
 
     defender.health -= attacker.secondary.damage;
-    switch(attacker.secondary.et) {
+    switch(attacker.secondary.effect_type) {
         case BLEED:
             defender.bleed_percent += attacker.secondary.effect_percent;
             if(defender.bleed_percent >= 1.0) {

@@ -1,0 +1,45 @@
+This config works as follows:
+
+Structure:
+The allowed weapons text file is a list of all weapons that will be shown as options in the game.
+The game will throw an error if you include a weapon name on the allowed weapons list that is not in
+the weapons.csv file.
+
+The weapons.csv file dictates the stats of any weapon. This can include weapons that are not in the
+allowed weapons text file, but it is discouraged to do so.
+
+To make sure that a weapon is loaded into the game, the first value in its entry in weapons.csv must
+match one of the values in the allowed_weapons.txt file.
+
+Additionally, the allowed_weapons.txt & weapons.csv files must have the names listed in alphabetical order
+to ensure that they are parsed correctly.
+
+weapons.csv Fields:
+name: The name of the weapon, must match with a value in the allowed_weapons.txt file if intended to be in game; values - string
+weapon_type - The general type of weapon; values: AXE, CLUB, DAGGER, FIST, HAMMER, KATANA, MACE, SHIELD, SPEAR, SWORD
+damage_type - The type of damage this weapon deals; values: BLUNT,  PIERCING, SLASHING
+num_attacks - The number of attacks a unit can make with this weapon; values - int
+damage - The damage done per successful attack; values - int
+effect_type - The special property of the weapon; values - BLEED, BLOCK, POISON, STUN, NONE
+effect_damage - The damage related to an effect; values - int
+effect_percent - the percentage related to the effect; values - decimal < 1
+
+Effect explanations:
+BLEED - When this weapon hits, the target's bleed meter fills up by "effect_percent". If the bleed meter is filled up to 1.0, 100%,
+the target takes "effect_damage" slashing damage, and the bleed meter resets.
+
+BLOCK - Your block_chance additively increases by the "effect_percent".
+
+POISON - When this weapon hits, the target's poison meter fills up by "effect_percent", up to 1.0. At the end of the turn the target
+takes damage equal to "effect_damage" * mult, where mult is determined by the current fullness of the poison meter.
+mult    range
+1       0.0 - 0.17
+2       0.17 - 0.34
+3       0.34 - 0.51
+4       0.51 - 0.68
+5       0.68 - 0.84
+6       0.84 - 1.0
+
+STUN - When this weapon hits, the target's stun meter fills up by "effect_percent". If the stun meter is filled up to 1.0, 100%, the
+target adds an instance of stunned, and the stun meter resets. A unit that has an instance of stunned reduces the number by 1 and
+skips their turn.
