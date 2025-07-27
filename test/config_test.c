@@ -129,8 +129,8 @@ int main() {
         }
     }
 
-    unit_t* team1_units = malloc(4*sizeof(unit_t));
-    unit_t* team2_units = malloc(4*sizeof(unit_t));
+    unit_t team1_units[4];
+    unit_t team2_units[4];
 
     int choice = 0;
     int shield_idx = -1;
