@@ -22,11 +22,11 @@ unit_t create_unit(weapon_t primary, weapon_t secondary, int team_id, int health
     return unit;
 }
 
-team_t create_team(unit_t units[], char *name, int team_id) {
+team_t create_team(unit_t units[], char *name, size_t size, int team_id) {
     team_t team = {
         .units = units,
         .name = name,
-        .size = 4,
+        .size = size,
         .team_id = team_id
     };
     return team;

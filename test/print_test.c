@@ -21,9 +21,9 @@ int main() {
     unit_t unit24 = create_unit(generic, generic, 2, 50, 5, 0.0, 0.15);
     unit_t team1_units[4] = {unit11, unit12, unit13, unit14};
     unit_t team2_units[4] = {unit21, unit22, unit23, unit24};
-    team_t team1 = create_team(team1_units, "Funny Bois", 1);
+    team_t team1 = create_team(team1_units, "Funny Bois", (size_t)4, 1);
     printf("Team 1 size: %zu\n", team1.size);
-    team_t team2 = create_team(team2_units, "Speedy Bois", 2);
+    team_t team2 = create_team(team2_units, "Speedy Bois", (size_t)4, 2);
     printf("Team 2 size: %zu\n", team2.size);
     print_team(team1);
     print_team(team2);
