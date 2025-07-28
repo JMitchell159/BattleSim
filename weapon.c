@@ -15,6 +15,20 @@ weapon_t create_weapon(weapon_type_t wt, damage_type_t dt, int num_attacks, int 
     return w;
 }
 
+int weapon_rank(weapon_t weapon) {
+    int result = 0;
+    switch(weapon.effect_type) {
+        case POISON:
+            return 4;
+        case STUN:
+            return 3;
+        case BLEED:
+            return 2;
+        default:
+            return 1;
+    }
+}
+
 void print_weapon(weapon_t weapon) {
     printf("Weapon Type: ");
     switch(weapon.weapon_type) {

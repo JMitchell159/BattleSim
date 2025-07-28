@@ -50,6 +50,14 @@ unit_t end_of_turn(unit_t unit) {
     return unit;
 }
 
+int team_health(team_t team) {
+    int result = 0;
+    for(int i = 0; i < team.size; i++) {
+        if(team.units[i].health > 0) result += team.units[i].health;
+    }
+    return result;
+}
+
 void print_team(team_t t) {
     printf("%s\n", t.name);
     char empty[] = "";
@@ -57,7 +65,8 @@ void print_team(team_t t) {
     strcpy(line1, empty);
     strcat(line1, "=");
     for(int i = 0; i < t.size; i++) {
-        strcat(line1, "======");
+        if(t.units[i].health > 0) strcat(line1, "======");
+        else strcat(line1, "=DEAD=");
     }
     strcat(line1, "=\n");
     printf("%s", line1);
@@ -73,7 +82,8 @@ void print_team(team_t t) {
     strcpy(line3, empty);
     strcat(line3, "|");
     for(int i = 0; i < t.size; i++) {
-        strcat(line3, " (_)  ");
+        if(t.units[i].health > 0) strcat(line3, " (_)  ");
+        else strcat(line3, " (X)  ");
     }
     strcat(line3, "|\n");
     printf("%s", line3);
